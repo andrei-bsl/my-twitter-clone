@@ -8,22 +8,17 @@ async function getTweets() {
 
 export default async function Home() {
   const tweets = await getTweets();
-  console.log('tweets', tweets);
 
   return (
-    <div className="flex min-h-screen items-center justify-center bg-zinc-50 font-sans dark:bg-black">
-      <main className="flex min-h-screen w-full max-w-3xl flex-col items-center py-32 px-16 bg-white dark:bg-black sm:items-start">
-        <div className="flex flex-col items-center gap-6 text-center sm:items-start sm:text-left">
-          <h1 className="max-w-xs text-3xl font-semibold leading-10 tracking-tight text-black dark:text-zinc-50">
-            Latest Tweets
-          </h1>
-              {tweets.posts.map((tweet) => (
-                <Link href={`/tweet/${tweet.id}`} key={tweet.id}>
-                  <TweetCard key={tweet.id} tweet={tweet} />
-                </Link>
-              ))}
-        </div>
-      </main>
-    </div>
+    <main className="container mx-auto p-6 min-h-screen">
+      <h1 className="text-3xl font-bold text-center my-6 text-gray-900 dark:text-white">📝 Latest Tweets</h1>
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+        {tweets.posts.map((tweet) => (
+          <Link href={`/tweet/${tweet.id}`} key={tweet.id}>
+            <TweetCard tweet={tweet} />
+          </Link>
+        ))}
+      </div>
+    </main>
   );
 }

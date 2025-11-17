@@ -10,15 +10,41 @@ export default async function TweetDetail({ params }) {
     const tweet = await getTweet(id);
 
     return (
-        <main className="p-16 bg-white dark:bg-black min-h-screen flex flex-col space-x-10">
-            <h1>{tweet.title}</h1>
-            <p>{tweet.body}</p>
-            <p>
-                👍 {tweet.reactions.likes} | 👎 {tweet.reactions.dislikes}
-            </p>
-            <Link href="/" className="mt-10 text-blue-500 hover:underline">
-                ← Back to Feed
-            </Link>
+        <main className="container mx-auto p-6 min-h-screen">
+            <div className="max-w-2xl mx-auto bg-white dark:bg-gray-800 rounded-lg shadow-lg p-8 mt-8">
+                <h1 className="text-3xl font-bold text-gray-900 dark:text-white mb-4">
+                    {tweet.title}
+                </h1>
+                <p className="text-gray-700 dark:text-gray-300 text-lg leading-relaxed mb-6">
+                    {tweet.body}
+                </p>
+                <div className="flex items-center space-x-6 text-gray-600 dark:text-gray-400 mb-6">
+                    <span className="flex items-center space-x-2">
+                        <span>👍</span>
+                        <span className="font-semibold">{tweet.reactions.likes}</span>
+                    </span>
+                    <span className="flex items-center space-x-2">
+                        <span>👎</span>
+                        <span className="font-semibold">{tweet.reactions.dislikes}</span>
+                    </span>
+                </div>
+                <div className="flex flex-wrap gap-2 mb-6">
+                    {tweet.tags.map((tag) => (
+                        <span 
+                            key={tag} 
+                            className="bg-blue-100 dark:bg-blue-900 text-blue-800 dark:text-blue-200 px-3 py-1 rounded-full text-sm"
+                        >
+                            #{tag}
+                        </span>
+                    ))}
+                </div>
+                <Link 
+                    href="/" 
+                    className="inline-block mt-4 text-blue-500 hover:text-blue-700 dark:text-blue-400 dark:hover:text-blue-300 font-semibold transition"
+                >
+                    ← Back to Feed
+                </Link>
+            </div>
         </main>
     );
 }

@@ -1,7 +1,10 @@
 import Link from "next/link";
 
 async function getTweet(id) {
-  const res = await fetch(`https://dummyjson.com/posts/${id}`);
+  const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || "http://localhost:3000";
+  const res = await fetch(`${baseUrl}/api/tweets/${id}`, {
+    cache: "no-store",
+  });
   return res.json();
 }
 

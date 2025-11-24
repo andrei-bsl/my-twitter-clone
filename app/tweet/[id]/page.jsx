@@ -1,10 +1,26 @@
 import Link from "next/link";
+import { Tweet } from "@/models/Tweet";
+import { makeSureDbIsReady } from "@/lib/db";
 
 async function getTweet(id) {
-  const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || "http://localhost:3000";
-  const res = await fetch(`${baseUrl}/api/tweets/${id}`, {
-    cache: "no-store",
-  });
+  // Check if database should be used
+  const shouldUseDatabase = process.env.MONGODB_URI && process.env.MONGODB_URI.length > 0;
+  
+  if (shouldUseDatabase) {
+    try {
+      await makeSureDbIsReady();
+      const tweet = await Tweet.findById(id);
+      
+      if (tweet) {
+        return tweet.toObject();
+      }
+    } catch (error) {
+      console.warn("⚠️ Database error, falling back to external API:", error.message);
+    }
+  }
+
+  // Fallback to external API
+  const res = await fetch(`https://dummyjson.com/posts/${id}`);
   return res.json();
 }
 

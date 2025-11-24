@@ -1,13 +1,36 @@
 import TweetCard from "@/components/TweetCard";
 import Link from "next/link";
+import { Tweet } from "@/models/Tweet";
+import { makeSureDbIsReady } from "@/lib/db";
 
 async function getTweets() {
-  // Use absolute URL for server-side fetch in production
-  const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || "http://localhost:3000";
-  const res = await fetch(`${baseUrl}/api/tweets`, {
-    cache: "no-store", // Always get fresh data
-  });
+  // Check if database should be used
+  const shouldUseDatabase = process.env.MONGODB_URI && process.env.MONGODB_URI.length > 0;
+  
+  if (shouldUseDatabase) {
+    try {
+      await makeSureDbIsReady();
+      const tweets = await Tweet.find({}).sort({ createdAt: -1 }).lean();
+      
+      const formattedTweets = tweets.map((tweet) => ({
+        id: tweet._id.toString(),
+        title: tweet.title,
+        body: tweet.body,
+        tags: tweet.tags,
+        reactions: tweet.reactions,
+        views: tweet.views,
+        userId: tweet.userId,
+      }));
+      
+      return { posts: formattedTweets };
+    } catch (error) {
+      console.warn("⚠️ Database error, falling back to external API:", error.message);
+    }
+  }
 
+  // Fallback to external API
+  const res = await fetch("https://dummyjson.com/posts");
+  
   if (!res.ok) {
     throw new Error("Failed to fetch tweets");
   }

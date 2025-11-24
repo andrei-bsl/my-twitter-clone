@@ -10,6 +10,8 @@ WORKDIR /app
 COPY package*.json ./
 RUN npm ci
 COPY . .
+
+# Build the application
 RUN npm run build
 
 # Stage 3: Runner

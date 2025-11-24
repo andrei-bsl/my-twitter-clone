@@ -85,6 +85,19 @@ const dummyTweets = [
 ];
 
 export async function GET(request) {
+  // Check if database should be used (skip if MONGODB_URI is not set)
+  const shouldUseDatabase = process.env.MONGODB_URI && process.env.MONGODB_URI.length > 0;
+  
+  if (!shouldUseDatabase) {
+    return Response.json(
+      {
+        success: false,
+        error: "Database is not configured. Please set MONGODB_URI environment variable.",
+      },
+      { status: 503 }
+    );
+  }
+
   try {
     console.log("🌱 Starting database seed...");
 

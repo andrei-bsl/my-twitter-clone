@@ -2,14 +2,19 @@ import { makeSureDbIsReady } from "@/lib/db";
 import { Tweet } from "@/models/Tweet";
 
 export async function GET() {
+  // Check if database should be used (skip if MONGODB_URI is not set)
+  const shouldUseDatabase = process.env.MONGODB_URI && process.env.MONGODB_URI.length > 0;
+  
   let dbAvailable = false;
 
-  try {
-    // Try to connect to database
-    await makeSureDbIsReady();
-    dbAvailable = true;
-  } catch (dbError) {
-    console.warn("⚠️ Database not available, will use external API:", dbError.message);
+  if (shouldUseDatabase) {
+    try {
+      // Try to connect to database
+      await makeSureDbIsReady();
+      dbAvailable = true;
+    } catch (dbError) {
+      console.warn("⚠️ Database not available, will use external API:", dbError.message);
+    }
   }
 
   // If database is available, try to get tweets from it

@@ -19,9 +19,10 @@ dist
 # Debug
 *.log
 
-# Local env files
+# Local env files (but keep .env.production for Docker builds)
 .env*.local
-.env
+.env.development
+.env.test
 
 # Vercel
 .vercel

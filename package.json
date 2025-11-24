@@ -14,8 +14,8 @@
     "docker:clean": "docker compose down -v",
     "db:seed": "curl http://localhost:3000/api/demo-data",
     "docker:build": "docker build -t my-twitter-clone .",
-    "docker:build:gcp": "docker build -t gcr.io/YOUR_PROJECT_ID/my-twitter-clone .",
-    "docker:push:gcp": "docker push gcr.io/YOUR_PROJECT_ID/my-twitter-clone",
+    "docker:build:gcp": "docker build -t gcr.io/redi-fullstack-demo/my-twitter-clone .",
+    "docker:push:gcp": "docker push gcr.io/redi-fullstack-demo/my-twitter-clone",
     "docker:run:local": "docker run -p 3000:3000 --env-file .env.local my-twitter-clone"
   },
   "dependencies": {

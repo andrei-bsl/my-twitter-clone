@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { Tweet } from "@/models/Tweet";
 import { makeSureDbIsReady } from "@/lib/db";
+import FavoriteButton from "@/components/FavoriteButton";
 
 async function getTweet(id) {
   // Check if database should be used
@@ -31,9 +32,12 @@ export default async function TweetDetail({ params }) {
     return (
         <main className="container mx-auto p-6 min-h-screen">
             <div className="max-w-2xl mx-auto bg-white dark:bg-gray-800 rounded-lg shadow-lg p-8 mt-8">
-                <h1 className="text-3xl font-bold text-gray-900 dark:text-white mb-4">
-                    {tweet.title}
-                </h1>
+                <div className="flex justify-between items-start gap-4 mb-4">
+                    <h1 className="text-3xl font-bold text-gray-900 dark:text-white flex-1">
+                        {tweet.title}
+                    </h1>
+                    <FavoriteButton tweetId={tweet.id || id} />
+                </div>
                 <p className="text-gray-700 dark:text-gray-300 text-lg leading-relaxed mb-6">
                     {tweet.body}
                 </p>

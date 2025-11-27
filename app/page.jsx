@@ -1,4 +1,5 @@
 import TweetCard from "@/components/TweetCard";
+import FavoritesList from "@/components/FavoritesList";
 import Link from "next/link";
 import { Tweet } from "@/models/Tweet";
 import { makeSureDbIsReady } from "@/lib/db";
@@ -46,6 +47,13 @@ export default async function Home() {
       <h1 className="text-3xl font-bold text-center my-6 text-gray-900 dark:text-white">
         📝 Latest Tweets
       </h1>
+      
+      {/* Favorites Section */}
+      <div className="mb-8">
+        <FavoritesList tweets={tweets.posts} />
+      </div>
+
+      {/* All Tweets Grid */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
         {tweets.posts.map((tweet) => (
           <Link href={`/tweet/${tweet.id}`} key={tweet.id}>

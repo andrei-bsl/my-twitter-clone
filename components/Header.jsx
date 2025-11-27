@@ -23,6 +23,10 @@ export default function Header() {
             Home
           </Link>
           
+          <Link href="/middleware-demo" className="hover:text-gray-200 transition">
+            Middleware Demo
+          </Link>
+          
           {session && (
             <>
               <Link 

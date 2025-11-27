@@ -1,14 +1,19 @@
 "use client";
 
-import { createContext, useState, useContext, useEffect } from "react";
+import { createContext, useState, useContext, useEffect, useMemo } from "react";
+import { useSession } from "next-auth/react";
 
 const FavoritesContext = createContext();
 
 export function FavoritesProvider({ children }) {
-  // Initialize state with localStorage value
+  const { data: session } = useSession();
+  const userId = useMemo(() => session?.user?.id || "guest", [session?.user?.id]);
+
+  // Initialize state with user-specific favorites
   const [favoriteTweetIds, setFavoriteTweetIds] = useState(() => {
     if (typeof window !== "undefined") {
-      const stored = localStorage.getItem("favoriteTweets");
+      const storageKey = `favoriteTweets_${userId}`;
+      const stored = localStorage.getItem(storageKey);
       if (stored) {
         try {
           return JSON.parse(stored);
@@ -20,12 +25,13 @@ export function FavoritesProvider({ children }) {
     return [];
   });
 
-  // Save favorites to localStorage whenever they change
+  // Save favorites to localStorage whenever they change (per user)
   useEffect(() => {
     if (typeof window !== "undefined") {
-      localStorage.setItem("favoriteTweets", JSON.stringify(favoriteTweetIds));
+      const storageKey = `favoriteTweets_${userId}`;
+      localStorage.setItem(storageKey, JSON.stringify(favoriteTweetIds));
     }
-  }, [favoriteTweetIds]);
+  }, [favoriteTweetIds, userId]);
 
   const addToFavorites = (tweetId) => {
     setFavoriteTweetIds((prev) => {

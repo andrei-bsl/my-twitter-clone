@@ -5,6 +5,7 @@ import { useSession } from "next-auth/react";
 import { useEffect, useState } from "react";
 import TweetCard from "@/components/TweetCard";
 import Link from "next/link";
+import Button from "@/components/ui/Button";
 
 export default function FavoritesPage() {
   const { favoriteTweetIds } = useFavorites();
@@ -70,11 +71,10 @@ export default function FavoritesPage() {
           <p className="text-gray-600 dark:text-gray-400 mb-6">
             Start adding tweets to your favorites!
           </p>
-          <Link
-            href="/"
-            className="bg-blue-500 hover:bg-blue-600 text-white px-6 py-3 rounded-lg font-semibold transition"
-          >
-            Browse Tweets
+          <Link href="/">
+            <Button variant="primary">
+              Browse Tweets
+            </Button>
           </Link>
         </div>
       ) : (

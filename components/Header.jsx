@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { useSession, signOut } from "next-auth/react";
 import { useFavorites } from "@/context/FavoritesContext";
+import Button from "@/components/ui/Button";
 
 export default function Header() {
   const { data: session, status } = useSession();
@@ -45,19 +46,19 @@ export default function Header() {
               <span className="text-sm">
                 Hi, <span className="font-semibold">{session.user.name}</span>
               </span>
-              <button
+              <Button
+                variant="danger"
                 onClick={() => signOut({ callbackUrl: "/" })}
-                className="bg-red-500 hover:bg-red-600 px-4 py-2 rounded-lg transition text-sm font-semibold"
+                className="text-sm"
               >
                 Logout
-              </button>
+              </Button>
             </div>
           ) : (
-            <Link
-              href="/login"
-              className="bg-green-500 hover:bg-green-600 px-4 py-2 rounded-lg transition text-sm font-semibold"
-            >
-              Login
+            <Link href="/login">
+              <Button variant="success" className="text-sm">
+                Login
+              </Button>
             </Link>
           )}
         </nav>

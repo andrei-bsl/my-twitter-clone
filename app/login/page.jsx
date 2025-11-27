@@ -4,6 +4,7 @@ import { signIn } from "next-auth/react";
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
+import Button from "@/components/ui/Button";
 
 export default function LoginPage() {
   const [username, setUsername] = useState("");
@@ -88,13 +89,14 @@ export default function LoginPage() {
             </div>
           )}
 
-          <button
+          <Button
             type="submit"
             disabled={loading}
-            className="w-full bg-blue-500 hover:bg-blue-600 text-white font-semibold py-3 rounded-lg transition disabled:opacity-50 disabled:cursor-not-allowed"
+            variant="primary"
+            className="w-full py-3"
           >
             {loading ? "Logging in..." : "Login"}
-          </button>
+          </Button>
         </form>
 
         <div className="mt-6 p-4 bg-gray-100 dark:bg-gray-700 rounded-lg">

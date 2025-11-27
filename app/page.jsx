@@ -4,6 +4,9 @@ import Link from "next/link";
 import { Tweet } from "@/models/Tweet";
 import { makeSureDbIsReady } from "@/lib/db";
 
+// Enable ISR - revalidate every 60 seconds
+export const revalidate = 60;
+
 async function getTweets() {
   // Check if database should be used
   const shouldUseDatabase = process.env.MONGODB_URI && process.env.MONGODB_URI.length > 0;
@@ -41,12 +44,18 @@ async function getTweets() {
 
 export default async function Home() {
   const tweets = await getTweets();
+  const generatedAt = new Date().toLocaleString();
 
   return (
     <main className="container mx-auto p-6 min-h-screen">
-      <h1 className="text-3xl font-bold text-center my-6 text-gray-900 dark:text-white">
-        📝 Latest Tweets
-      </h1>
+      <div className="flex justify-between items-center my-6">
+        <h1 className="text-3xl font-bold text-gray-900 dark:text-white">
+          📝 Latest Tweets
+        </h1>
+        <div className="text-sm text-gray-500 dark:text-gray-400">
+          <span className="font-semibold">ISR Enabled</span> • Generated at {generatedAt}
+        </div>
+      </div>
       
       {/* Favorites Section */}
       <div className="mb-8">

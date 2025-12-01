@@ -1,3 +1,10 @@
+# 🚀 Twitter Clone Development Services
+#
+# To use Redis caching feature:
+# 1. Run: npm install ioredis
+# 2. Add to .env.local: REDIS_URL=redis://localhost:6379
+# 3. Start services: docker-compose up -d
+
 services:
   mongo:
     image: mongo:8.0
@@ -23,5 +30,20 @@ services:
     depends_on:
       - mongo
 
+  redis:
+    image: redis:alpine
+    container_name: twitter-clone-redis
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis-data:/data
+    command: redis-server --appendonly yes
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 5s
+      timeout: 3s
+      retries: 5
+
 volumes:
   mongo-data:
+  redis-data:

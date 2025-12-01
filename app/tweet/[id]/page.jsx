@@ -1,24 +1,52 @@
 // 📝 EXERCISE 2: Dynamic Routes with ISR
 // 
-// 🎯 Starting Point: This is a STATIC route that only works for tweet #5
-// 🎯 Goal: Convert this to a DYNAMIC route /tweet/[id] that works for any tweet
+// 🎯 Goal: Convert the static /tweet/5 route to dynamic /tweet/[id] with ISR
 //
-// 📚 Steps to complete this exercise:
-// 1. Rename this folder from "5" to "[id]" to make it a dynamic route
-// 2. Add generateStaticParams() to pre-build pages (see TODOs in the file)
-// 3. Add ISR with revalidate = 60
-// 4. Make the fetch URL dynamic using the id parameter
+// 📚 What you'll learn:
+// - Dynamic route segments with [id]
+// - generateStaticParams() for pre-building pages
+// - ISR (Incremental Static Regeneration) for optimal performance
+// - Difference between SSR, SSG, and ISR
 //
-// 💡 Why dynamic routes?
-// - Static: /tweet/5 → only works for tweet #5
-// - Dynamic: /tweet/[id] → works for /tweet/1, /tweet/2, /tweet/999, etc.
+// 💡 Background:
+// Currently we have /tweet/5 (static route) that only works for tweet #5
+// We need /tweet/[id] (dynamic route) that works for ANY tweet ID
 //
-// 📖 After renaming folder, see the TODOs in app/tweet/[id]/page.jsx
+// ✅ Your Tasks:
+// 1. Add generateStaticParams() to pre-build pages for tweets 1-30
+// 2. Add ISR configuration with revalidate = 60
+// 3. Make the fetch URL dynamic using the id parameter
+//
+// 📖 See page.exercise2.response.jsx for the complete solution
 
 import Link from "next/link";
 import { Tweet } from "@/models/Tweet";
 import { makeSureDbIsReady } from "@/lib/db";
 import FavoriteButton from "@/components/FavoriteButton";
+
+// TODO #1: Add generateStaticParams() function
+// This tells Next.js which pages to pre-build at build time
+//
+// Hint:
+// export async function generateStaticParams() {
+//   return Array.from({ length: 30 }, (_, i) => ({
+//     id: String(i + 1),
+//   }));
+// }
+//
+// This will pre-build /tweet/1, /tweet/2, ... /tweet/30 at build time
+// Other IDs (31+) will be generated on-demand (on first visit)
+
+// TODO #2: Add ISR configuration
+// Enable Incremental Static Regeneration with 60-second revalidation
+//
+// Hint:
+// export const revalidate = 60;
+//
+// This will:
+// - Cache the page for 60 seconds
+// - After 60s, regenerate in background on next visit
+// - Serve cached version while regenerating
 
 async function getTweet(id) {
   // Check if database should be used
@@ -37,8 +65,15 @@ async function getTweet(id) {
     }
   }
 
-  // Fallback to external API
+  // TODO #3: Make this URL dynamic
+  // Current: Static URL hardcoded to tweet #5
+  // Needed: Dynamic URL using the id parameter
+  //
+  // Change this line:
   const res = await fetch(`https://dummyjson.com/posts/5`);
+  //
+  // To this:
+  // const res = await fetch(`https://dummyjson.com/posts/${id}`);
   
   if (!res.ok) {
     throw new Error(`Failed to fetch tweet: ${res.status}`);

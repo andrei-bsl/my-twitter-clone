@@ -1,24 +1,34 @@
-// 📝 EXERCISE 2: Dynamic Routes with ISR
-// 
-// 🎯 Starting Point: This is a STATIC route that only works for tweet #5
-// 🎯 Goal: Convert this to a DYNAMIC route /tweet/[id] that works for any tweet
-//
-// 📚 Steps to complete this exercise:
-// 1. Rename this folder from "5" to "[id]" to make it a dynamic route
-// 2. Add generateStaticParams() to pre-build pages (see TODOs in the file)
-// 3. Add ISR with revalidate = 60
-// 4. Make the fetch URL dynamic using the id parameter
-//
-// 💡 Why dynamic routes?
-// - Static: /tweet/5 → only works for tweet #5
-// - Dynamic: /tweet/[id] → works for /tweet/1, /tweet/2, /tweet/999, etc.
-//
-// 📖 After renaming folder, see the TODOs in app/tweet/[id]/page.jsx
-
 import Link from "next/link";
 import { Tweet } from "@/models/Tweet";
 import { makeSureDbIsReady } from "@/lib/db";
 import FavoriteButton from "@/components/FavoriteButton";
+
+// 🎓 ISR CONFIGURATION (for teaching purposes)
+// Uncomment ONE of the following to demonstrate different rendering modes:
+
+// ✅ CURRENTLY ACTIVE: ISR with Static Params
+// Pre-build pages for tweets 1-30, regenerate every 60 seconds
+export async function generateStaticParams() {
+  // Pre-build the first 30 tweet pages at build time
+  return Array.from({ length: 30 }, (_, i) => ({
+    id: String(i + 1),
+  }));
+}
+
+export const revalidate = 60; // Regenerate pages every 60 seconds
+
+// 🔄 OPTION 1: Pure SSR (Server-Side Rendering)
+// Uncomment to fetch fresh data on EVERY request
+// export const dynamic = 'force-dynamic';
+
+// 📦 OPTION 2: ISR without pre-building
+// Comment out generateStaticParams() to only use on-demand ISR
+// Pages are generated on first visit, then cached and revalidated
+
+// 💡 COMPARISON:
+// ISR + generateStaticParams: Build 1-30 at build time → Cache → Regenerate every 60s → Fast from day 1 ⚡
+// ISR only (revalidate): Generate on demand → Cache → Regenerate every 60s → Slow first visit, fast after 🔄
+// SSR (force-dynamic): Fetch every request → Never cached → Always slow but fresh 🐌
 
 async function getTweet(id) {
   // Check if database should be used
@@ -38,7 +48,7 @@ async function getTweet(id) {
   }
 
   // Fallback to external API
-  const res = await fetch(`https://dummyjson.com/posts/5`);
+  const res = await fetch(`https://dummyjson.com/posts/${id}`);
   
   if (!res.ok) {
     throw new Error(`Failed to fetch tweet: ${res.status}`);

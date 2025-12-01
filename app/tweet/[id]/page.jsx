@@ -70,11 +70,8 @@ async function getTweet(id) {
   // Needed: Dynamic URL using the id parameter
   //
   // Change this line:
-  const res = await fetch(`https://dummyjson.com/posts/5`);
-  //
-  // To this:
-  // const res = await fetch(`https://dummyjson.com/posts/${id}`);
-  
+  const res = await fetch(`https://dummyjson.com/posts/${id}`);
+
   if (!res.ok) {
     throw new Error(`Failed to fetch tweet: ${res.status}`);
   }

@@ -64,20 +64,17 @@ async function getTweets() {
     }
   }
 
-  // TODO #1: Implement API fallback
-  // 1. Fetch from "https://dummyjson.com/posts"
-  // 2. Check if response is ok, throw error if not: if (!res.ok) throw new Error("Failed to fetch tweets");
-  // 3. Return res.json()
-  //
-  // Hint:
-  // const res = await fetch("https://dummyjson.com/posts");
-  // if (!res.ok) {
-  //   throw new Error("Failed to fetch tweets");
-  // }
-  // return res.json();
-  
-  // Placeholder: Remove this when you implement the API fallback above
-  return { posts: [] };
+  const res = await fetch("https://dummyjson.com/posts");
+
+  if (!res.ok) {
+    throw new Error("Failed to fetch tweets");
+  }
+
+  console.log("Fetched tweets from external API");
+
+  return res.json();
+
+
 }
 
 export default async function Home() {
@@ -102,26 +99,11 @@ export default async function Home() {
 
       {/* All Tweets Grid */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-        {/* TODO #2: Map over tweets.posts and render each tweet
-            
-            Use this structure:
-            {tweets.posts.map((tweet) => (
-              <Link href={`/tweet/${tweet.id}`} key={tweet.id}>
-                <TweetCard tweet={tweet} />
-              </Link>
-            ))}
-            
-            Remember:
-            - .map() iterates over the array
-            - key={tweet.id} is required for React lists
-            - Link href uses template literals: /tweet/${tweet.id}
-            - TweetCard receives tweet as a prop
-        */}
-        
-        {/* Placeholder: Remove this when you implement the mapping above */}
-        <div className="col-span-full text-center py-8 text-gray-500">
-          Complete TODO #1 and TODO #2 to see tweets here
-        </div>
+        { tweets.posts.map((tweet) => (
+          <Link key={tweet.id} href={`/tweet/${tweet.id}`}>
+            <TweetCard tweet={tweet} />
+          </Link>
+        ))}
       </div>
     </main>
   );

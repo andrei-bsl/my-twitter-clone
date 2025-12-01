@@ -23,6 +23,7 @@ import Link from "next/link";
 import { Tweet } from "@/models/Tweet";
 import { makeSureDbIsReady } from "@/lib/db";
 import FavoriteButton from "@/components/FavoriteButton";
+import CommentSection from "@/components/CommentSection";
 
 // TODO #1: Add generateStaticParams() function
 // This tells Next.js which pages to pre-build at build time
@@ -142,6 +143,9 @@ export default async function TweetDetail({ params }) {
         >
           ← Back to Feed
         </Link>
+
+        {/* Comments Section */}
+        <CommentSection tweetId={id} />
       </div>
     </main>
   );

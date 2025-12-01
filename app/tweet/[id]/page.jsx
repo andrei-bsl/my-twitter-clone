@@ -22,7 +22,13 @@ async function getTweet(id) {
 
   // Fallback to external API
   const res = await fetch(`https://dummyjson.com/posts/${id}`);
-  return res.json();
+  
+  if (!res.ok) {
+    throw new Error(`Failed to fetch tweet: ${res.status}`);
+  }
+  
+  const data = await res.json();
+  return data;
 }
 
 export default async function TweetDetail({ params }) {

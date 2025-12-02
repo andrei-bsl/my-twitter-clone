@@ -16,6 +16,7 @@ import TweetCard from "@/components/TweetCard";
 import FavoritesList from "@/components/FavoritesList";
 import Link from "next/link";
 import { Tweet } from "@/models/Tweet";
+import { Reaction } from "@/models/Reaction";
 import { makeSureDbIsReady } from "@/lib/db";
 
 // 🎓 RENDERING STRATEGIES SHOWCASE (for teaching purposes)
@@ -48,12 +49,32 @@ async function getTweets() {
       await makeSureDbIsReady();
       const tweets = await Tweet.find({}).sort({ createdAt: -1 }).lean();
       
+      // Fetch reaction counts for all tweets
+      const tweetIds = tweets.map(t => t._id.toString());
+      const reactionCounts = await Reaction.aggregate([
+        { $match: { sourceType: "tweet", sourceId: { $in: tweetIds } } },
+        { $group: {
+            _id: { sourceId: "$sourceId", type: "$type" },
+            count: { $sum: 1 }
+          }
+        }
+      ]);
+      
+      // Create a map of reaction counts
+      const reactionMap = {};
+      reactionCounts.forEach(({ _id, count }) => {
+        if (!reactionMap[_id.sourceId]) {
+          reactionMap[_id.sourceId] = { likes: 0, dislikes: 0 };
+        }
+        reactionMap[_id.sourceId][_id.type === "like" ? "likes" : "dislikes"] = count;
+      });
+      
       const formattedTweets = tweets.map((tweet) => ({
         id: tweet._id.toString(),
         title: tweet.title,
         body: tweet.body,
         tags: tweet.tags,
-        reactions: tweet.reactions,
+        reactions: reactionMap[tweet._id.toString()] || { likes: 0, dislikes: 0 },
         views: tweet.views,
         userId: tweet.userId,
       }));

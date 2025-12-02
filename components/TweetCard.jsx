@@ -1,6 +1,7 @@
 "use client";
 
 import { useFavorites } from "@/context/FavoritesContext";
+import ReactionButtons from "@/components/ReactionButtons";
 
 export default function TweetCard({ tweet }) {
   const { toggleFavorite, isFavorite } = useFavorites();
@@ -27,9 +28,12 @@ export default function TweetCard({ tweet }) {
         </button>
       </div>
       <div className="flex justify-between items-center mt-4 text-sm text-gray-600 dark:text-gray-400">
-        <p>
-          👍 {tweet.reactions.likes} | 👎 {tweet.reactions.dislikes}
-        </p>
+        <ReactionButtons
+          sourceId={tweet.id}
+          sourceType="tweet"
+          initialLikes={tweet.reactions?.likes || 0}
+          initialDislikes={tweet.reactions?.dislikes || 0}
+        />
         <p className="text-blue-500 dark:text-blue-400">{tweet.tags.join(", ")}</p>
       </div>
     </div>

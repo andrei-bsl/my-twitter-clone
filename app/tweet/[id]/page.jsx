@@ -24,6 +24,7 @@ import { Tweet } from "@/models/Tweet";
 import { makeSureDbIsReady } from "@/lib/db";
 import FavoriteButton from "@/components/FavoriteButton";
 import CommentSection from "@/components/CommentSection";
+import ReactionButtons from "@/components/ReactionButtons";
 
 // TODO #1: Add generateStaticParams() function
 // This tells Next.js which pages to pre-build at build time
@@ -117,16 +118,17 @@ export default async function TweetDetail({ params }) {
         <p className="text-gray-700 dark:text-gray-300 text-lg leading-relaxed mb-6">
           {tweet.body}
         </p>
-        <div className="flex items-center space-x-6 text-gray-600 dark:text-gray-400 mb-6">
-          <span className="flex items-center space-x-2">
-            <span>👍</span>
-            <span className="font-semibold">{tweet.reactions.likes}</span>
-          </span>
-          <span className="flex items-center space-x-2">
-            <span>👎</span>
-            <span className="font-semibold">{tweet.reactions.dislikes}</span>
-          </span>
+        
+        {/* Reactions */}
+        <div className="mb-6">
+          <ReactionButtons 
+            sourceId={tweet.id || id} 
+            sourceType="tweet"
+            initialLikes={tweet.reactions?.likes || 0}
+            initialDislikes={tweet.reactions?.dislikes || 0}
+          />
         </div>
+
         <div className="flex flex-wrap gap-2 mb-6">
           {tweet.tags.map((tag) => (
             <span 

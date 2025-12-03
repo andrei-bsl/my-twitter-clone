@@ -4,6 +4,7 @@ import { useState, useEffect } from "react";
 import { useSession } from "next-auth/react";
 import { useComments } from "@/context/CommentsContext";
 import Button from "@/components/ui/Button";
+import CommentLikeButton from "@/components/CommentLikeButton";
 
 export default function CommentSection({ tweetId }) {
   const { data: session } = useSession();
@@ -152,7 +153,11 @@ export default function CommentSection({ tweetId }) {
                   </Button>
                 )}
               </div>
-              <p className="text-gray-700 dark:text-gray-300">{comment.text}</p>
+              <p className="text-gray-700 dark:text-gray-300 mb-3">{comment.text}</p>
+              <CommentLikeButton 
+                commentId={comment._id} 
+                initialLikes={0}
+              />
             </div>
           ))
         )}

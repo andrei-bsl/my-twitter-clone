@@ -21,6 +21,7 @@
     "docker:run:local": "docker run -p 3000:3000 --env-file .env.local my-twitter-clone"
   },
   "dependencies": {
+    "bcryptjs": "^3.0.3",
     "ioredis": "^5.8.2",
     "mongoose": "^8.20.0",
     "next": "16.0.3",

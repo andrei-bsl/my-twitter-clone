@@ -2,6 +2,29 @@ import { makeSureDbIsReady } from "@/lib/db.js";
 import { Tweet } from "@/models/Tweet.js";
 import { Reaction } from "@/models/Reaction.js";
 import { Comment } from "@/models/Comment.js";
+import { User } from "@/models/User.js";
+import bcrypt from "bcryptjs";
+
+const dummyUsers = [
+  {
+    username: "john",
+    email: "john@example.com",
+    password: "password123",
+    name: "John Doe",
+  },
+  {
+    username: "jane",
+    email: "jane@example.com",
+    password: "password123",
+    name: "Jane Smith",
+  },
+  {
+    username: "demo",
+    email: "demo@example.com",
+    password: "demo",
+    name: "Demo User",
+  },
+];
 
 const dummyTweets = [
   {
@@ -76,7 +99,7 @@ const dummyTweets = [
   },
 ];
 
-const dummyUsers = ["john", "jane", "demo"];
+const reactionAuthors = ["john", "jane", "demo"];
 
 export async function GET(request) {
   // Check if database should be used (skip if MONGODB_URI is not set)
@@ -102,7 +125,19 @@ export async function GET(request) {
     const deleteResult = await Tweet.deleteMany({});
     await Reaction.deleteMany({});
     await Comment.deleteMany({});
-    console.log(`🗑️  Deleted ${deleteResult.deletedCount} existing tweets, all reactions, and comments`);
+    await User.deleteMany({});
+    console.log(`🗑️  Deleted ${deleteResult.deletedCount} existing tweets, all reactions, comments, and users`);
+
+    // Create users with hashed passwords
+    const hashedUsers = await Promise.all(
+      dummyUsers.map(async (user) => ({
+        ...user,
+        password: await bcrypt.hash(user.password, 10),
+      }))
+    );
+
+    const insertedUsers = await User.insertMany(hashedUsers);
+    console.log(`👥 Inserted ${insertedUsers.length} users with hashed passwords`);
 
     // Insert dummy tweets
     const insertedTweets = await Tweet.insertMany(dummyTweets);
@@ -131,7 +166,7 @@ export async function GET(request) {
         reactions.push({
           sourceType: "tweet",
           sourceId: tweet._id.toString(),
-          author: dummyUsers[i % dummyUsers.length] + (i > 2 ? i : ""),
+          author: reactionAuthors[i % reactionAuthors.length] + (i > 2 ? i : ""),
           type: "like",
         });
       }
@@ -141,7 +176,7 @@ export async function GET(request) {
         reactions.push({
           sourceType: "tweet",
           sourceId: tweet._id.toString(),
-          author: dummyUsers[(i + likes) % dummyUsers.length] + (i + likes > 2 ? (i + likes) : ""),
+          author: reactionAuthors[(i + likes) % reactionAuthors.length] + (i + likes > 2 ? (i + likes) : ""),
           type: "dislike",
         });
       }
@@ -180,6 +215,7 @@ export async function GET(request) {
     console.log(`💬 Inserted ${comments.length} comments`);
 
     // Get stats
+    const totalUsers = await User.countDocuments();
     const totalTweets = await Tweet.countDocuments();
     const totalReactions = await Reaction.countDocuments();
     const totalComments = await Comment.countDocuments();
@@ -198,6 +234,7 @@ export async function GET(request) {
       success: true,
       message: "Database seeded successfully! 🎉",
       stats: {
+        totalUsers,
         totalTweets,
         totalReactions,
         totalComments,
@@ -208,6 +245,7 @@ export async function GET(request) {
     };
 
     console.log("\n📊 Seed Summary:");
+    console.log(`   Total users: ${result.stats.totalUsers}`);
     console.log(`   Total tweets: ${result.stats.totalTweets}`);
     console.log(`   Total reactions: ${result.stats.totalReactions} (${result.stats.totalLikes} likes, ${result.stats.totalDislikes} dislikes)`);
     console.log(`   Total comments: ${result.stats.totalComments}`);

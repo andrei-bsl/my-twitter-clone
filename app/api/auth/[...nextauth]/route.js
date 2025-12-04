@@ -1,8 +1,11 @@
 import NextAuth from "next-auth";
 import CredentialsProvider from "next-auth/providers/credentials";
+import bcrypt from "bcryptjs";
+import { makeSureDbIsReady } from "@/lib/db";
+import { User } from "@/models/User";
 
-// Mock users for demo/testing purposes
-const users = [
+// Mock users for demo/testing purposes (fallback when no DB)
+const mockUsers = [
   {
     id: "1",
     username: "john",
@@ -35,14 +38,60 @@ const authOptions = {
         password: { label: "Password", type: "password" },
       },
       async authorize(credentials) {
-        // Find user by username
-        const user = users.find(
+        // Check if database should be used
+        const shouldUseDatabase =
+          process.env.MONGODB_URI && process.env.MONGODB_URI.length > 0;
+
+        if (shouldUseDatabase) {
+          try {
+            // Try to authenticate with database
+            await makeSureDbIsReady();
+
+            // Find user by username
+            const user = await User.findOne({
+              username: credentials?.username,
+            }).select("+password"); // Explicitly include password field
+
+            if (!user) {
+              console.log("❌ User not found in database");
+              return null;
+            }
+
+            // Compare password with hashed password
+            const isPasswordValid = await bcrypt.compare(
+              credentials?.password,
+              user.password
+            );
+
+            if (!isPasswordValid) {
+              console.log("❌ Invalid password");
+              return null;
+            }
+
+            console.log("✅ Database authentication successful");
+            // Return user object (without password)
+            return {
+              id: user._id.toString(),
+              name: user.name,
+              email: user.email,
+              username: user.username,
+            };
+          } catch (error) {
+            console.warn(
+              "⚠️ Database authentication error, falling back to mock users:",
+              error.message
+            );
+          }
+        }
+
+        // Fallback to mock users
+        console.log("🔄 Using mock user authentication");
+        const user = mockUsers.find(
           (u) => u.username === credentials?.username
         );
 
-        // Check if user exists and password matches
+        // Check if user exists and password matches (plain text for mock)
         if (user && user.password === credentials?.password) {
-          // Return user object (without password)
           return {
             id: user.id,
             name: user.name,
@@ -51,7 +100,6 @@ const authOptions = {
           };
         }
 
-        // Return null if authentication fails
         return null;
       },
     }),

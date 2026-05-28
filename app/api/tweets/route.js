@@ -1,9 +1,9 @@
-import { makeSureDbIsReady } from "@/lib/db";
+import { isDatabaseEnabled, makeSureDbIsReady } from "@/lib/db";
 import { Tweet } from "@/models/Tweet";
 
 export async function GET() {
   // Check if database should be used (skip if MONGODB_URI is not set)
-  const shouldUseDatabase = process.env.MONGODB_URI && process.env.MONGODB_URI.length > 0;
+  const shouldUseDatabase = isDatabaseEnabled();
   
   let dbAvailable = false;
 
@@ -97,6 +97,16 @@ export async function GET() {
 
 // POST endpoint to create a new tweet
 export async function POST(req) {
+  if (!isDatabaseEnabled()) {
+    return Response.json(
+      {
+        error: "Database is disabled",
+        message: "Set USE_DATABASE=true and start MongoDB to create tweets",
+      },
+      { status: 503 }
+    );
+  }
+
   try {
     await makeSureDbIsReady();
     const body = await req.json();
@@ -114,6 +124,16 @@ export async function POST(req) {
 
 // DELETE endpoint to clear all tweets (useful for testing)
 export async function DELETE() {
+  if (!isDatabaseEnabled()) {
+    return Response.json(
+      {
+        error: "Database is disabled",
+        message: "Set USE_DATABASE=true and start MongoDB to delete tweets",
+      },
+      { status: 503 }
+    );
+  }
+
   try {
     await makeSureDbIsReady();
     const result = await Tweet.deleteMany({});

@@ -21,10 +21,11 @@
 
 import Link from "next/link";
 import { Tweet } from "@/models/Tweet";
-import { makeSureDbIsReady } from "@/lib/db";
+import { isDatabaseEnabled, makeSureDbIsReady } from "@/lib/db";
 import FavoriteButton from "@/components/FavoriteButton";
 import CommentSection from "@/components/CommentSection";
 import ReactionButtons from "@/components/ReactionButtons";
+import mongoose from "mongoose";
 
 // TODO #1: Add generateStaticParams() function
 // This tells Next.js which pages to pre-build at build time
@@ -51,10 +52,12 @@ import ReactionButtons from "@/components/ReactionButtons";
 // - Serve cached version while regenerating
 
 async function getTweet(id) {
+  const isMongoObjectId = mongoose.isValidObjectId(id);
+
   // Check if database should be used
-  const shouldUseDatabase = process.env.MONGODB_URI && process.env.MONGODB_URI.length > 0;
+  const shouldUseDatabase = isDatabaseEnabled();
   
-  if (shouldUseDatabase) {
+  if (shouldUseDatabase && isMongoObjectId) {
     try {
       await makeSureDbIsReady();
       const tweet = await Tweet.findById(id);

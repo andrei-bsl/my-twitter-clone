@@ -17,7 +17,7 @@ import FavoritesList from "@/components/FavoritesList";
 import Link from "next/link";
 import { Tweet } from "@/models/Tweet";
 import { Reaction } from "@/models/Reaction";
-import { makeSureDbIsReady } from "@/lib/db";
+import { isDatabaseEnabled, makeSureDbIsReady } from "@/lib/db";
 
 // 🎓 RENDERING STRATEGIES SHOWCASE (for teaching purposes)
 // Uncomment ONE of the following to demonstrate different Next.js rendering modes:
@@ -42,7 +42,7 @@ export const revalidate = 60;
 
 async function getTweets() {
   // Check if database should be used
-  const shouldUseDatabase = process.env.MONGODB_URI && process.env.MONGODB_URI.length > 0;
+  const shouldUseDatabase = isDatabaseEnabled();
   
   if (shouldUseDatabase) {
     try {

@@ -1,25 +1,23 @@
 "use client";
 
 import { signIn } from "next-auth/react";
-import { useState, useEffect } from "react";
+import { Suspense, useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import Link from "next/link";
 import Button from "@/components/ui/Button";
 
-export default function LoginPage() {
+function LoginPageContent() {
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
-  const [success, setSuccess] = useState("");
   const [loading, setLoading] = useState(false);
   const router = useRouter();
   const searchParams = useSearchParams();
 
-  useEffect(() => {
-    if (searchParams.get("registered") === "true") {
-      setSuccess("Account created successfully! Please log in.");
-    }
-  }, [searchParams]);
+  // Derive success message from URL params
+  const success = searchParams.get("registered") === "true"
+    ? "Account created successfully! Please log in."
+    : "";
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -115,7 +113,7 @@ export default function LoginPage() {
 
         <div className="mt-6 text-center">
           <p className="text-sm text-gray-600 dark:text-gray-400">
-            Don't have an account?{" "}
+            {"Don't have an account? "}
             <Link
               href="/register"
               className="text-blue-500 hover:text-blue-600 font-semibold"
@@ -146,5 +144,23 @@ export default function LoginPage() {
         </div>
       </div>
     </main>
+  );
+}
+
+function LoginPageFallback() {
+  return (
+    <main className="container mx-auto p-6 min-h-screen flex items-center justify-center">
+      <div className="max-w-md w-full bg-white dark:bg-gray-800 rounded-lg shadow-lg p-8 text-center">
+        <p className="text-gray-600 dark:text-gray-300">Loading login...</p>
+      </div>
+    </main>
+  );
+}
+
+export default function LoginPage() {
+  return (
+    <Suspense fallback={<LoginPageFallback />}>
+      <LoginPageContent />
+    </Suspense>
   );
 }

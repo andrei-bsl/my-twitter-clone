@@ -1,5 +1,5 @@
 import { Comment } from "@/models/Comment";
-import { makeSureDbIsReady } from "@/lib/db";
+import { isDatabaseEnabled, makeSureDbIsReady } from "@/lib/db";
 
 export async function GET(request) {
   const { searchParams } = new URL(request.url);
@@ -10,7 +10,7 @@ export async function GET(request) {
   }
 
   // Check if database should be used
-  const shouldUseDatabase = process.env.MONGODB_URI && process.env.MONGODB_URI.length > 0;
+  const shouldUseDatabase = isDatabaseEnabled();
 
   if (shouldUseDatabase) {
     try {
@@ -35,7 +35,7 @@ export async function POST(request) {
   }
 
   // Check if database should be used
-  const shouldUseDatabase = process.env.MONGODB_URI && process.env.MONGODB_URI.length > 0;
+  const shouldUseDatabase = isDatabaseEnabled();
 
   if (shouldUseDatabase) {
     try {
@@ -68,7 +68,7 @@ export async function DELETE(request) {
   }
 
   // Check if database should be used
-  const shouldUseDatabase = process.env.MONGODB_URI && process.env.MONGODB_URI.length > 0;
+  const shouldUseDatabase = isDatabaseEnabled();
 
   if (shouldUseDatabase) {
     try {

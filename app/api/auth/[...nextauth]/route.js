@@ -1,7 +1,7 @@
 import NextAuth from "next-auth";
 import CredentialsProvider from "next-auth/providers/credentials";
 import bcrypt from "bcryptjs";
-import { makeSureDbIsReady } from "@/lib/db";
+import { isDatabaseEnabled, makeSureDbIsReady } from "@/lib/db";
 import { User } from "@/models/User";
 
 // Mock users for demo/testing purposes (fallback when no DB)
@@ -29,7 +29,7 @@ const mockUsers = [
   },
 ];
 
-const authOptions = {
+export const authOptions = {
   providers: [
     CredentialsProvider({
       name: "Credentials",
@@ -39,8 +39,7 @@ const authOptions = {
       },
       async authorize(credentials) {
         // Check if database should be used
-        const shouldUseDatabase =
-          process.env.MONGODB_URI && process.env.MONGODB_URI.length > 0;
+        const shouldUseDatabase = isDatabaseEnabled();
 
         if (shouldUseDatabase) {
           try {

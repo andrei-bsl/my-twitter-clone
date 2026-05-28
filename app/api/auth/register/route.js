@@ -1,13 +1,12 @@
 import { NextResponse } from "next/server";
 import bcrypt from "bcryptjs";
-import { makeSureDbIsReady } from "@/lib/db";
+import { isDatabaseEnabled, makeSureDbIsReady } from "@/lib/db";
 import { User } from "@/models/User";
 
 export async function POST(request) {
   try {
     // Check if database should be used
-    const shouldUseDatabase =
-      process.env.MONGODB_URI && process.env.MONGODB_URI.length > 0;
+    const shouldUseDatabase = isDatabaseEnabled();
 
     if (!shouldUseDatabase) {
       return NextResponse.json(

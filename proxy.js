@@ -1,7 +1,7 @@
 import { NextResponse } from "next/server";
 import { getToken } from "next-auth/jwt";
 
-export async function middleware(request) {
+export async function proxy(request) {
   // Get the pathname of the request
   const { pathname } = request.nextUrl;
 
@@ -12,8 +12,10 @@ export async function middleware(request) {
   });
 
   // Check if accessing protected routes
-  const isProtectedPage = pathname.startsWith("/favorites");
-  const isProtectedAPI = pathname.startsWith("/api/favorites");
+  const isProtectedPage = pathname.startsWith("/favorites") || pathname === "/tweet";
+  const isProtectedAPI =
+    pathname.startsWith("/api/favorites") ||
+    pathname.startsWith("/api/tweets/my-tweets");
 
   // If accessing protected route without token, redirect/reject
   if ((isProtectedPage || isProtectedAPI) && !token) {
@@ -35,10 +37,12 @@ export async function middleware(request) {
   return NextResponse.next();
 }
 
-// Configure which routes to run middleware on
+// Configure which routes to run proxy on
 export const config = {
   matcher: [
     "/favorites/:path*",
+    "/tweet",
     "/api/favorites/:path*",
+    "/api/tweets/my-tweets/:path*"
   ],
 };

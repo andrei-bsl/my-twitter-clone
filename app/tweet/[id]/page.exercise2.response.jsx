@@ -1,7 +1,8 @@
 import Link from "next/link";
 import { Tweet } from "@/models/Tweet";
-import { makeSureDbIsReady } from "@/lib/db";
+import { isDatabaseEnabled, makeSureDbIsReady } from "@/lib/db";
 import FavoriteButton from "@/components/FavoriteButton";
+import mongoose from "mongoose";
 
 // 🎓 ISR CONFIGURATION (for teaching purposes)
 // Uncomment ONE of the following to demonstrate different rendering modes:
@@ -31,10 +32,12 @@ export const revalidate = 60; // Regenerate pages every 60 seconds
 // SSR (force-dynamic): Fetch every request → Never cached → Always slow but fresh 🐌
 
 async function getTweet(id) {
+  const isMongoObjectId = mongoose.isValidObjectId(id);
+
   // Check if database should be used
-  const shouldUseDatabase = process.env.MONGODB_URI && process.env.MONGODB_URI.length > 0;
+  const shouldUseDatabase = isDatabaseEnabled();
   
-  if (shouldUseDatabase) {
+  if (shouldUseDatabase && isMongoObjectId) {
     try {
       await makeSureDbIsReady();
       const tweet = await Tweet.findById(id);

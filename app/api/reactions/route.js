@@ -1,5 +1,5 @@
 import { Reaction } from "@/models/Reaction";
-import { makeSureDbIsReady } from "@/lib/db";
+import { isDatabaseEnabled, makeSureDbIsReady } from "@/lib/db";
 
 // GET - Get reactions for a source (tweet or comment)
 export async function GET(request) {
@@ -11,7 +11,7 @@ export async function GET(request) {
     return Response.json({ error: "sourceId required" }, { status: 400 });
   }
 
-  const shouldUseDatabase = process.env.MONGODB_URI && process.env.MONGODB_URI.length > 0;
+  const shouldUseDatabase = isDatabaseEnabled();
 
   if (shouldUseDatabase) {
     try {
@@ -51,7 +51,7 @@ export async function POST(request) {
     return Response.json({ error: "Invalid reaction type" }, { status: 400 });
   }
 
-  const shouldUseDatabase = process.env.MONGODB_URI && process.env.MONGODB_URI.length > 0;
+  const shouldUseDatabase = isDatabaseEnabled();
 
   if (shouldUseDatabase) {
     try {
@@ -113,7 +113,7 @@ export async function DELETE(request) {
     return Response.json({ error: "sourceId and author required" }, { status: 400 });
   }
 
-  const shouldUseDatabase = process.env.MONGODB_URI && process.env.MONGODB_URI.length > 0;
+  const shouldUseDatabase = isDatabaseEnabled();
 
   if (shouldUseDatabase) {
     try {

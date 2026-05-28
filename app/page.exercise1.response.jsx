@@ -2,14 +2,14 @@ import TweetCard from "@/components/TweetCard";
 import FavoritesList from "@/components/FavoritesList";
 import Link from "next/link";
 import { Tweet } from "@/models/Tweet";
-import { makeSureDbIsReady } from "@/lib/db";
+import { isDatabaseEnabled, makeSureDbIsReady } from "@/lib/db";
 
 // Enable ISR - revalidate every 60 seconds
 export const revalidate = 60;
 
 async function getTweets() {
   // Check if database should be used
-  const shouldUseDatabase = process.env.MONGODB_URI && process.env.MONGODB_URI.length > 0;
+  const shouldUseDatabase = isDatabaseEnabled();
   
   if (shouldUseDatabase) {
     try {

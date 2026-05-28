@@ -1,4 +1,4 @@
-import { makeSureDbIsReady } from "@/lib/db.js";
+import { isDatabaseEnabled, makeSureDbIsReady } from "@/lib/db.js";
 import { Tweet } from "@/models/Tweet.js";
 import { Reaction } from "@/models/Reaction.js";
 import { Comment } from "@/models/Comment.js";
@@ -103,7 +103,7 @@ const reactionAuthors = ["john", "jane", "demo"];
 
 export async function GET(request) {
   // Check if database should be used (skip if MONGODB_URI is not set)
-  const shouldUseDatabase = process.env.MONGODB_URI && process.env.MONGODB_URI.length > 0;
+  const shouldUseDatabase = isDatabaseEnabled();
   
   if (!shouldUseDatabase) {
     return Response.json(

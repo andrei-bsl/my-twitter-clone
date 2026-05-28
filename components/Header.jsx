@@ -33,6 +33,9 @@ export default function Header() {
           
           {session && (
             <>
+              <Link href="/tweet" className="hover:text-gray-200 transition">
+                My Tweets
+              </Link>
               <Link 
                 href="/favorites" 
                 className="hover:text-gray-200 transition flex items-center gap-2"

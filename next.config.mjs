@@ -2,7 +2,7 @@
 const nextConfig = {
   /* config options here */
   reactCompiler: true,
-  output: 'standalone',
+  // output: 'standalone',
   // Optimize production builds
   compress: true,
 };

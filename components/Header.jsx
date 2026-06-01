@@ -15,7 +15,7 @@ export default function Header() {
       <div className="container mx-auto flex justify-between items-center px-6">
         <h1 className="text-2xl font-bold">
           <Link href="/" className="hover:text-gray-200 transition">
-            🐦 Twitter Clone !!!
+            🐦 Twitter Clone !!!!!!!!!!
           </Link>
         </h1>
         <nav className="flex items-center space-x-4">

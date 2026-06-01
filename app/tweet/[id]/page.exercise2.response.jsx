@@ -1,55 +1,35 @@
-// 📝 EXERCISE 2: Dynamic Routes with ISR
-// 
-// 🎯 Goal: Convert the static /tweet/5 route to dynamic /tweet/[id] with ISR
-//
-// 📚 What you'll learn:
-// - Dynamic route segments with [id]
-// - generateStaticParams() for pre-building pages
-// - ISR (Incremental Static Regeneration) for optimal performance
-// - Difference between SSR, SSG, and ISR
-//
-// 💡 Background:
-// Currently we have /tweet/5 (static route) that only works for tweet #5
-// We need /tweet/[id] (dynamic route) that works for ANY tweet ID
-//
-// ✅ Your Tasks:
-// 1. Add generateStaticParams() to pre-build pages for tweets 1-30
-// 2. Add ISR configuration with revalidate = 60
-// 3. Make the fetch URL dynamic using the id parameter
-//
-// 📖 See page.exercise2.response.jsx for the complete solution
-
 import Link from "next/link";
 import { Tweet } from "@/models/Tweet";
 import { isDatabaseEnabled, makeSureDbIsReady } from "@/lib/db";
 import FavoriteButton from "@/components/FavoriteButton";
-import CommentSection from "@/components/CommentSection";
-import ReactionButtons from "@/components/ReactionButtons";
 import mongoose from "mongoose";
 
-// TODO #1: Add generateStaticParams() function
-// This tells Next.js which pages to pre-build at build time
-//
-// Hint:
-// export async function generateStaticParams() {
-//   return Array.from({ length: 30 }, (_, i) => ({
-//     id: String(i + 1),
-//   }));
-// }
-//
-// This will pre-build /tweet/1, /tweet/2, ... /tweet/30 at build time
-// Other IDs (31+) will be generated on-demand (on first visit)
+// 🎓 ISR CONFIGURATION (for teaching purposes)
+// Uncomment ONE of the following to demonstrate different rendering modes:
 
-// TODO #2: Add ISR configuration
-// Enable Incremental Static Regeneration with 60-second revalidation
-//
-// Hint:
-// export const revalidate = 60;
-//
-// This will:
-// - Cache the page for 60 seconds
-// - After 60s, regenerate in background on next visit
-// - Serve cached version while regenerating
+// ✅ CURRENTLY ACTIVE: ISR with Static Params
+// Pre-build pages for tweets 1-30, regenerate every 60 seconds
+export async function generateStaticParams() {
+  // Pre-build the first 30 tweet pages at build time
+  return Array.from({ length: 30 }, (_, i) => ({
+    id: String(i + 1),
+  }));
+}
+
+export const revalidate = 60; // Regenerate pages every 60 seconds
+
+// 🔄 OPTION 1: Pure SSR (Server-Side Rendering)
+// Uncomment to fetch fresh data on EVERY request
+// export const dynamic = 'force-dynamic';
+
+// 📦 OPTION 2: ISR without pre-building
+// Comment out generateStaticParams() to only use on-demand ISR
+// Pages are generated on first visit, then cached and revalidated
+
+// 💡 COMPARISON:
+// ISR + generateStaticParams: Build 1-30 at build time → Cache → Regenerate every 60s → Fast from day 1 ⚡
+// ISR only (revalidate): Generate on demand → Cache → Regenerate every 60s → Slow first visit, fast after 🔄
+// SSR (force-dynamic): Fetch every request → Never cached → Always slow but fresh 🐌
 
 async function getTweet(id) {
   const isMongoObjectId = mongoose.isValidObjectId(id);
@@ -70,13 +50,9 @@ async function getTweet(id) {
     }
   }
 
-  // TODO #3: Make this URL dynamic
-  // Current: Static URL hardcoded to tweet #5
-  // Needed: Dynamic URL using the id parameter
-  //
-  // Change this line:
+  // Fallback to external API
   const res = await fetch(`https://dummyjson.com/posts/${id}`);
-
+  
   if (!res.ok) {
     throw new Error(`Failed to fetch tweet: ${res.status}`);
   }
@@ -121,17 +97,16 @@ export default async function TweetDetail({ params }) {
         <p className="text-gray-700 dark:text-gray-300 text-lg leading-relaxed mb-6">
           {tweet.body}
         </p>
-        
-        {/* Reactions */}
-        <div className="mb-6">
-          <ReactionButtons 
-            sourceId={tweet.id || id} 
-            sourceType="tweet"
-            initialLikes={tweet.reactions?.likes || 0}
-            initialDislikes={tweet.reactions?.dislikes || 0}
-          />
+        <div className="flex items-center space-x-6 text-gray-600 dark:text-gray-400 mb-6">
+          <span className="flex items-center space-x-2">
+            <span>👍</span>
+            <span className="font-semibold">{tweet.reactions.likes}</span>
+          </span>
+          <span className="flex items-center space-x-2">
+            <span>👎</span>
+            <span className="font-semibold">{tweet.reactions.dislikes}</span>
+          </span>
         </div>
-
         <div className="flex flex-wrap gap-2 mb-6">
           {tweet.tags.map((tag) => (
             <span 
@@ -148,9 +123,6 @@ export default async function TweetDetail({ params }) {
         >
           ← Back to Feed
         </Link>
-
-        {/* Comments Section */}
-        <CommentSection tweetId={id} />
       </div>
     </main>
   );

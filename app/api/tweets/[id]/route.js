@@ -1,13 +1,15 @@
-import { makeSureDbIsReady } from "@/lib/db.js";
+import { isDatabaseEnabled, makeSureDbIsReady } from "@/lib/db.js";
 import { Tweet } from "@/models/Tweet.js";
+import mongoose from "mongoose";
 
 export async function GET(request, { params }) {
   const { id } = await params;
+  const isMongoObjectId = mongoose.isValidObjectId(id);
   
   // Check if database should be used (skip if MONGODB_URI is not set)
-  const shouldUseDatabase = process.env.MONGODB_URI && process.env.MONGODB_URI.length > 0;
+  const shouldUseDatabase = isDatabaseEnabled();
 
-  if (shouldUseDatabase) {
+  if (shouldUseDatabase && isMongoObjectId) {
     try {
       // Try to get tweet from database
       await makeSureDbIsReady();

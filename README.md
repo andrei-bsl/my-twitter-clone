@@ -5,10 +5,12 @@ A modern Twitter clone built with Next.js, MongoDB, and Tailwind CSS.
 ## Features
 
 - 📝 Display tweets in a responsive grid layout
+- 🔐 **User authentication with NextAuth.js**
+- 👥 **User registration with bcrypt password hashing**
 - 💾 MongoDB database integration with Mongoose ORM
 - 🐳 Docker Compose setup for local development
 - 🎨 Tailwind CSS styling with dark mode support
-- 🔄 Automatic API fallback (fetch from external API if DB is empty)
+- 🔄 Automatic fallback (mock users when DB is not configured)
 
 ## Getting Started
 
@@ -87,14 +89,43 @@ MONGODB_URI=mongodb://admin:password123@localhost:27017/twitter-clone?authSource
 ├── lib/
 │   └── db.js                  # Database connection utility
 ├── models/
-│   └── Tweet.js               # Mongoose Tweet schema
+│   ├── Tweet.js               # Mongoose Tweet schema
+│   ├── User.js                # Mongoose User schema
+│   ├── Comment.js             # Mongoose Comment schema
+│   └── Reaction.js            # Mongoose Reaction schema
 ├── docker-compose.yml         # Docker services configuration
 └── .env.local                 # Environment variables
 ```
 
 ## API Endpoints
 
-### GET `/api/tweets`
+### Authentication
+
+#### POST `/api/auth/register`
+Register a new user (requires database).
+
+```json
+{
+  "username": "johndoe",
+  "email": "john@example.com",
+  "password": "password123",
+  "name": "John Doe"
+}
+```
+
+#### POST `/api/auth/[...nextauth]`
+NextAuth.js authentication endpoint. Handles login/logout with credentials.
+
+**Demo Users (mock mode):**
+- Username: `john` / Password: `password123`
+- Username: `jane` / Password: `password123`
+- Username: `demo` / Password: `demo`
+
+**Database mode:** Users are authenticated against MongoDB with bcrypt-hashed passwords.
+
+### Tweets
+
+#### GET `/api/tweets`
 Fetches tweets from database. If empty, fetches from external API and saves to DB.
 
 ### POST `/api/tweets`
@@ -123,10 +154,44 @@ Access Mongo Express at `http://localhost:8081` to:
 ## Technologies Used
 
 - **Next.js 16** - React framework with App Router
+- **NextAuth.js** - Authentication for Next.js
 - **MongoDB 8** - NoSQL database
 - **Mongoose** - ODM for MongoDB
+- **bcryptjs** - Password hashing
 - **Tailwind CSS 4** - Utility-first CSS framework
 - **Docker** - Containerization for MongoDB
+
+## Authentication System
+
+This project implements a **dual-mode authentication system**:
+
+### Without Database (Demo Mode)
+- Uses hardcoded mock users
+- Plain text password comparison
+- Perfect for testing without MongoDB
+
+### With Database (Production Mode)
+- User data stored in MongoDB
+- Passwords hashed with bcrypt (10 salt rounds)
+- Secure authentication with NextAuth.js
+- User registration via `/register` page
+
+### Security Features
+- ✅ Passwords never stored in plain text
+- ✅ bcrypt hashing with salt rounds
+- ✅ Mongoose schema validation
+- ✅ Unique username and email constraints
+- ✅ Password minimum length (6 characters)
+- ✅ Session management with JWT tokens
+
+### Testing Registration
+
+1. Start MongoDB: `npm run docker:dev`
+2. Seed database: `npm run db:seed`
+3. Visit `/register` to create a new account
+4. Login with your new credentials at `/login`
+
+**Note:** The seed script creates 3 demo users with hashed passwords (john, jane, demo).
 
 ## Learn More
 

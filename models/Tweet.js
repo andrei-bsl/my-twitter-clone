@@ -31,8 +31,12 @@ const TweetSchema = new mongoose.Schema(
       default: 0,
     },
     userId: {
-      type: Number,
+      type: mongoose.Schema.Types.Mixed,
       required: true,
+    },
+    authorId: {
+      type: String,
+      index: true,
     },
   },
   {
